@@ -3,19 +3,18 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_ui/List/SwipeItemList.dart';
-import 'package:flutter_ui/PullDownRefresh/PaintPullDownShadow.dart';
 
-class PullDownRefresh extends StatefulWidget {
+import 'PaintPullDownShadow.dart';
+
+class ListViewSwiperRefresh extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
-    return StatePullDownRefresh();
+    return StateListViewSwiperRefresh();
   }
 }
 
-class StatePullDownRefresh extends State<PullDownRefresh>
-    with TickerProviderStateMixin {
+class StateListViewSwiperRefresh extends State<ListViewSwiperRefresh> with TickerProviderStateMixin{
   double maxHeight = 120;
   double dy = 0;
   double angle = 0;
@@ -30,36 +29,40 @@ class StatePullDownRefresh extends State<PullDownRefresh>
   bool loading = false;
   ScrollController scrollController;
   bool absorbing = true;
+  bool isTop = true;
+  bool isBottm = false;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     scrollController = ScrollController();
-    scrollController.addListener(() {
-//      print("absorbing"+absorbing.toString());
-//      print("listener:"+scrollController.offset.toString());
-      if (scrollController.position.maxScrollExtent ==
-          scrollController.offset) {
-//        print("loadMore:"+scrollController.offset.toString());
-      }
-      if (scrollController.position.minScrollExtent ==
-          scrollController.offset) {
-//        print("refresh:"+scrollController.offset.toString());
-        absorbing = true;
-        setState(() {});
-      }
-    });
+    scrollController = ScrollController()
+      ..addListener(() {
+        if (scrollController.position.maxScrollExtent <=
+            scrollController.offset) {
+          //滑动到底部
+          isBottm = true;
+        } else if (scrollController.position.minScrollExtent >=
+            scrollController.offset) {
+          //滑动到顶部
+          isTop = true;
+        } else {
+          //其他
+          isBottm = false;
+          isTop = false;
+        }
+      });
     backAnimationController = new AnimationController(
         duration: Duration(milliseconds: 100), vsync: this)
       ..addStatusListener((statu) {
         if (statu == AnimationStatus.completed) {
           loadingAnimation = Tween<double>(begin: 0, end: 360)
               .animate(loadingAnimationController)
-                ..addListener(() {
-                  angle = loadingAnimation.value;
-                  setState(() {});
-                });
+            ..addListener(() {
+              angle = loadingAnimation.value;
+              setState(() {});
+            });
           loadingAnimationController.reset();
           loadingAnimationController.forward();
           // 模拟耗时操作
@@ -98,11 +101,11 @@ class StatePullDownRefresh extends State<PullDownRefresh>
   // 加载完成的隐藏动画
   void dismissAnimationFun() {
     dismissAnimation =
-        Tween<double>(begin: dy, end: 0).animate(dismissAnimationController)
-          ..addListener(() {
-            dy = dismissAnimation.value;
-            setState(() {});
-          });
+    Tween<double>(begin: dy, end: 0).animate(dismissAnimationController)
+      ..addListener(() {
+        dy = dismissAnimation.value;
+        setState(() {});
+      });
     dismissAnimationController.reset();
     dismissAnimationController.forward();
   }
@@ -112,9 +115,10 @@ class StatePullDownRefresh extends State<PullDownRefresh>
     // TODO: implement build
     return Scaffold(
       appBar: AppBar(
-        title: Text("下拉刷新"),
+        title: Text("listview pull down refresh"),
       ),
-      body: GestureDetector(
+      body:
+      Listener(
         behavior: HitTestBehavior.opaque,
         child: SafeArea(
           child: Stack(
@@ -129,32 +133,32 @@ class StatePullDownRefresh extends State<PullDownRefresh>
                       angle: loading
                           ? -angle
                           : ((dy > 50 && dy < 140)
-                              ? (dy - 50) * 4 * (pi / 180)
-                              : 0),
+                          ? (dy - 50) * 4 * (pi / 180)
+                          : 0),
                       //修改下面的图标和图片即可更换效果
                       child: loading
                           ? Icon(
-                              Icons.refresh,
-                              size: 40,
-                              color: Colors.grey,
-                            )
+                        Icons.refresh,
+                        size: 40,
+                        color: Colors.grey,
+                      )
                           : Image.asset(
-                              "assets/images/jiantou.png",
-                              color: Colors.grey,
-                            ),
+                        "assets/images/jiantou.png",
+                        color: Colors.grey,
+                      ),
                     ),
                   )),
               // 下拉阴影
               Positioned(
                   child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                color: Colors.transparent,
-                child: CustomPaint(
-                  painter: PullDownShadow(MediaQuery.of(context).size.width / 2,
-                      dy - 60, MediaQuery.of(context).size.width),
-                ),
-              )),
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    color: Colors.transparent,
+                    child: CustomPaint(
+                      painter: PullDownShadow(MediaQuery.of(context).size.width / 2,
+                          dy - 60, MediaQuery.of(context).size.width),
+                    ),
+                  )),
               Positioned(
                   top: -50 + dy,
                   child: Container(
@@ -163,20 +167,36 @@ class StatePullDownRefresh extends State<PullDownRefresh>
                     height: MediaQuery.of(context).size.height - 50,
                     alignment: Alignment.center,
                     //这里将"Text("Hello world")"替换成你想要下拉刷新的widget即可
-                    child: Text("Hello world"),
+                    child: ListView.builder(
+                        itemCount: 100,
+                        controller: scrollController,
+                        itemBuilder: (BuildContext context, int position) {
+                          return Container(
+                            alignment: Alignment.center,
+                            width: MediaQuery.of(context).size.width,
+                            height: 50,
+                            child: Text("List view Swiper Refresh ${position}"),
+                          );
+                        }),
                   )),
             ],
           ),
         ),
-        onVerticalDragStart: (detail) {
+        onPointerDown: (detail) {
           print("onVerticalDragStart----");
           if (loading) {
             return;
           }
+          if(!isTop){
+            return;
+          }
           dy = 0;
         },
-        onVerticalDragUpdate: (detail) {
+        onPointerMove: (detail) {
           if (loading) {
+            return;
+          }
+          if(!isTop){
             return;
           }
           if (dy >= 150) {
@@ -194,18 +214,21 @@ class StatePullDownRefresh extends State<PullDownRefresh>
           }
           setState(() {});
         },
-        onVerticalDragEnd: (detail) {
+        onPointerUp: (detail) {
           if (loading) {
+            return;
+          }
+          if(!isTop){
             return;
           }
           print("end:" + dy.toString());
           if (dy >= 120) {
             backAnimation = Tween<double>(begin: dy, end: 60)
                 .animate(backAnimationController)
-                  ..addListener(() {
-                    dy = backAnimation.value;
-                    setState(() {});
-                  });
+              ..addListener(() {
+                dy = backAnimation.value;
+                setState(() {});
+              });
             backAnimationController.reset();
             backAnimationController.forward();
             loading = true;
@@ -214,7 +237,7 @@ class StatePullDownRefresh extends State<PullDownRefresh>
           }
 //          dy = 0;
         },
-      ),
+      )
     );
   }
 }

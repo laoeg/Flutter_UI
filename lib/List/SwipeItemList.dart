@@ -33,11 +33,23 @@ class StateSwipeItemList extends State<SwipeItemList> with TickerProviderStateMi
   int currentPosition;
   int lastPosition;
   int deletePosition;
+  ScrollController scrollController;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    scrollController = ScrollController();
+    scrollController.addListener(() {
+      print("listener:"+scrollController.offset.toString());
+      if(scrollController.position.maxScrollExtent == scrollController.offset){
+        print("loadMore:"+scrollController.offset.toString());
+      }
+      if(scrollController.position.minScrollExtent == scrollController.offset){
+        print("refresh:"+scrollController.offset.toString());
+      }
+    });
+
     for(int i=0;i<40;i++){
       data.add("${i} item value,list swipe view");
     }
@@ -77,6 +89,7 @@ class StateSwipeItemList extends State<SwipeItemList> with TickerProviderStateMi
       ),
       body: ListView.builder(
           itemCount: data.length,
+          controller: scrollController,
           itemBuilder: (BuildContext context,int position){
             return GestureDetector(
               behavior: HitTestBehavior.opaque,
