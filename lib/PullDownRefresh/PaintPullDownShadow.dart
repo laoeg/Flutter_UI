@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-///用贝塞尔二阶曲线绘制下拉的阴影
+///用贝塞尔二阶曲线绘制下拉的阴影,类似弹簧的效果
 
 class PullDownShadow extends CustomPainter {
 
@@ -12,7 +12,7 @@ class PullDownShadow extends CustomPainter {
   PullDownShadow(this._centerX, this._centerY,this._screenWidth);
 
   Paint _paint = Paint()
-    ..color = Colors.blueGrey
+    ..color = Colors.black12
     ..style = PaintingStyle.fill
     ..isAntiAlias = true
     ..strokeWidth = 10;

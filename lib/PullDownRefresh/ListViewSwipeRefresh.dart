@@ -166,7 +166,7 @@ class StateListViewSwiperRefresh extends State<ListViewSwiperRefresh> with Ticke
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.height - 50,
                     alignment: Alignment.center,
-                    //这里将"Text("Hello world")"替换成你想要下拉刷新的widget即可
+                    //这里将"ListView"替换成你想要下拉刷新的widget即可
                     child: ListView.builder(
                         itemCount: 100,
                         controller: scrollController,
