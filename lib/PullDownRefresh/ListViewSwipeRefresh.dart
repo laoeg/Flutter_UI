@@ -42,11 +42,13 @@ class StateListViewSwiperRefresh extends State<ListViewSwiperRefresh> with Ticke
         if (scrollController.position.maxScrollExtent <=
             scrollController.offset) {
           //滑动到底部
+//          print("bottom");
           isBottm = true;
         } else if (scrollController.position.minScrollExtent >=
             scrollController.offset) {
           //滑动到顶部
           isTop = true;
+//          print("top");
         } else {
           //其他
           isBottm = false;
@@ -183,7 +185,6 @@ class StateListViewSwiperRefresh extends State<ListViewSwiperRefresh> with Ticke
           ),
         ),
         onPointerDown: (detail) {
-          print("onVerticalDragStart----");
           if (loading) {
             return;
           }

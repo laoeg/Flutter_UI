@@ -4,6 +4,9 @@ import 'package:flutter_ui/Hero/Hero.dart';
 import 'package:flutter_ui/List/SwipeItemList.dart';
 import 'package:flutter_ui/PullDownRefresh/ListViewSwipeRefresh.dart';
 import 'package:flutter_ui/PullDownRefresh/PullDownRefresh.dart';
+import 'package:flutter_ui/TabBar/OnePageTwoTabBar.dart';
+import 'package:flutter_ui/TabBar/ScrollTabBar.dart';
+import 'package:flutter_ui/TabBar/TestTwoPageVeiw.dart';
 
 void main() {
   runApp(MyApp());
@@ -68,6 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
     data.add(DataEntity("List", "List swipe item",SwipeItemList()));
     data.add(DataEntity("Refresh", "Pull down refresh",PullDownRefresh()));
     data.add(DataEntity("ListView Swipe Refresh", "ListView pull down Swipe Refresh",ListViewSwiperRefresh()));
+    data.add(DataEntity("TabBar", "Scroll Tab bar",ScrollTabBar()));
   }
 
   void _incrementCounter() {
@@ -95,45 +99,46 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: ListView.builder(
-        itemCount: data.length,
-          itemBuilder: (BuildContext context,int position){
-        return InkWell(
-          onTap: (){
-            print("点击了：$position");
-            Navigator.push(context, PageRouteBuilder(pageBuilder: (BuildContext context,Animation animation,Animation secondAnimation){
-              return data[position].goto;
-            }));
-          },
-          child: Container(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Container(
-                  margin: EdgeInsets.only(left: 10,right: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 10,),
-                      Text(data[position].name),
-                      SizedBox(height: 10,),
-                      Text(data[position].desc),
-                      SizedBox(height: 10,),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 1,
-                  color: Colors.grey,
-                )
-              ],
-            ),
-          ),
-        );
-      }),
+//      body: ListView.builder(
+//        itemCount: data.length,
+//          itemBuilder: (BuildContext context,int position){
+//        return InkWell(
+//          onTap: (){
+//            print("点击了：$position");
+//            Navigator.push(context, PageRouteBuilder(pageBuilder: (BuildContext context,Animation animation,Animation secondAnimation){
+//              return data[position].goto;
+//            }));
+//          },
+//          child: Container(
+//            child: Column(
+//              crossAxisAlignment: CrossAxisAlignment.start,
+//              mainAxisAlignment: MainAxisAlignment.start,
+//              children: [
+//                Container(
+//                  margin: EdgeInsets.only(left: 10,right: 10),
+//                  child: Column(
+//                    crossAxisAlignment: CrossAxisAlignment.start,
+//                    mainAxisAlignment: MainAxisAlignment.start,
+//                    children: [
+//                      SizedBox(height: 10,),
+//                      Text(data[position].name),
+//                      SizedBox(height: 10,),
+//                      Text(data[position].desc),
+//                      SizedBox(height: 10,),
+//                    ],
+//                  ),
+//                ),
+//                Container(
+//                  width: MediaQuery.of(context).size.width,
+//                  height: 1,
+//                  color: Colors.grey,
+//                )
+//              ],
+//            ),
+//          ),
+//        );
+//      }),
+    body: OnePageTwoTabBar(),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
